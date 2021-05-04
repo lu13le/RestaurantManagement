@@ -1,5 +1,6 @@
 ﻿@model RestaurantManagement.Models.ViewModels.MenuIteViewModel
 @using RestaurantManagement.Extensions
+
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,7 +10,7 @@
 <h2 class="text-info">Create Menu Item</h2>
 <br />
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" asp-action="Create" enctype="multipart/form-data">
     <div class="border backgroundWhite">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group row">
@@ -46,8 +47,8 @@
             <div class="col-5">
                 <input type="file" name="files" multiple class="form-control" />
             </div>
-
         </div>
+
         <div class="form-group row">
             <div class="col-2">
                 <label asp-for="MenuItem.CategoryId" class="col-form-label"></label>
@@ -55,16 +56,14 @@
             <div class="col-5">
                 <select asp-for="@Model.MenuItem.CategoryId" id="CategoryId" asp-items="Model.Categories.ToSelectListItem(Model.MenuItem.CategoryId)" class="form-control"></select>
             </div>
-
         </div>
         <div class="form-group row">
             <div class="col-2">
                 <label asp-for="MenuItem.SubcategoryId" class="col-form-label"></label>
             </div>
             <div class="col-5">
-                <select asp-for="@Model.MenuItem.SubcategoryId" name="SubcategoryId" id="SubcategoryId" asp-items="@(new SelectList(string.Empty,"Id","Name"))" class="form-control"></select>
+                <select asp-for="@Model.MenuItem.SubcategoryId" name="SubCategoryId" id="SubCategoryId" asp-items="@(new SelectList(string.Empty,"Id","Name"))" class="form-control"></select>
             </div>
-
         </div>
         <div class="form-group row">
             <div class="col-2">
@@ -73,7 +72,6 @@
             <div class="col-5">
                 <select asp-for="MenuItem.Spicyness" asp-items="Html.GetEnumSelectList<MenuItem.ESpicy>()" class="form-control"></select>
             </div>
-
         </div>
 
         <div class="form-group row">
@@ -93,6 +91,7 @@
         });
     </script>
 
+
     <script type="text/javascript">
         $(document).ready(function () {
             getSubCategory();
@@ -101,7 +100,7 @@
             });
         });
         function getSubCategory() {
-            var url = '@Url.Content("~/")' + "Admin/SubCategory/GetSubCategory";
+            var url = '@Url.Content("~/")' + "Admin/Subcategory/GetSubCategory";
             var ddlsoruce = '#CategoryId';
             $.getJSON(url, { id: $(ddlsoruce).val() }, function (data) {
                 var items = '';
