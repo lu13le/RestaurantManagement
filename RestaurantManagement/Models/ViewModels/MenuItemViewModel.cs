@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RestaurantManagement.Models.ViewModels
 {
-    public class MenuIteViewModel
+    public class MenuItemViewModel
     {
         public MenuItem MenuItem { get; set; }
         public IEnumerable<Category> Categories { get; set; }
