@@ -22,10 +22,7 @@ namespace RestaurantManagement.Controllers
             _db = db;
         }
 
-
-
-      
-
+        //Index page of project
         public async Task <IActionResult> Index()
         {
             IndexViewModel IndexVM = new IndexViewModel()
