@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RestaurantManagement.Data;
 using RestaurantManagement.Models;
+using RestaurantManagement.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,16 +15,27 @@ namespace RestaurantManagement.Controllers
     [Area("Customer")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext db)
         {
-            _logger = logger;
+            _db = db;
         }
 
-        public IActionResult Index()
+
+
+      
+
+        public async Task <IActionResult> Index()
         {
-            return View();
+            IndexViewModel IndexVM = new IndexViewModel()
+            {
+                MenuItems = await _db.MenuItems.Include(m => m.Category).Include(m => m.Subcategory).ToListAsync(),
+                Categories = await _db.Catetgories.ToListAsync(),
+                Coupons = await _db.Coupons.Where(c => c.IsActive == true).ToListAsync()
+
+            };
+            return View(IndexVM);
         }
 
         public IActionResult Privacy()
