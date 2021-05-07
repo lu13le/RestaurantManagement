@@ -15,6 +15,7 @@ using RestaurantManagement.Utility;
 
 namespace RestaurantManagement.Areas.Admin.Controllers
 {
+    [Authorize(Roles = SD.ManagerUser)]
     [Area("Admin")]
     public class MenuItemController : Controller
     {
