@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManagement.Data;
@@ -34,6 +35,20 @@ namespace RestaurantManagement.Controllers
             };
             return View(IndexVM);
         }
+
+        [Authorize]
+        public async Task<IActionResult>Details(int id)
+        {
+            var menuItemFromDb = await _db.MenuItems.Include(m => m.Category).Include(m => m.Subcategory).Where(m => m.Id == id).FirstOrDefaultAsync();
+
+            ShoppingCart cartObj = new ShoppingCart()
+            {
+                MenuItem = menuItemFromDb,
+                MenuItemId = menuItemFromDb.Id
+            };
+            return View(cartObj);
+        }
+
 
         public IActionResult Privacy()
         {
