@@ -53,6 +53,14 @@ namespace RestaurantManagement
 
             });
 
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+            });
+          
+
 
         }
 
@@ -74,7 +82,7 @@ namespace RestaurantManagement
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
 

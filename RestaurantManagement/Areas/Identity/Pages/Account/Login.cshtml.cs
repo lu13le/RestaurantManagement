@@ -11,6 +11,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using RestaurantManagement.Data;
+using Microsoft.EntityFrameworkCore;
+using RestaurantManagement.Models;
+using Microsoft.AspNetCore.Http;
+using RestaurantManagement.Utility;
 
 namespace RestaurantManagement.Areas.Identity.Pages.Account
 {
@@ -20,14 +25,16 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly ApplicationDbContext _db;
 
         public LoginModel(SignInManager<IdentityUser> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,ApplicationDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _db = db;
         }
 
         [BindProperty]
@@ -77,11 +84,18 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
+                    var user = await _db.Users.Where(u => u.Email == Input.Email).FirstOrDefaultAsync();
+
+                    List<ShoppingCart> lstShoppingCart = await _db.ShoppingCarts.Where(u => u.ApplicationUserId == user.Id).ToListAsync();
+
+                    HttpContext.Session.SetInt32(SD.ssShoppingCartCount, lstShoppingCart.Count);
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

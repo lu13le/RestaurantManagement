@@ -7,26 +7,29 @@ using System.Threading.Tasks;
 
 namespace RestaurantManagement.Models
 {
-    public class ShoppingCart
+    public class OrderDetails
     {
-        public ShoppingCart()
-        {
-            Count = 1;
-        }
-
+        [Key]
         public int Id { get; set; }
-        public string ApplicationUserId { get; set; }
 
-        [NotMapped]
-        [ForeignKey("ApplicationUserId")]
-        public virtual ApplicationUser ApplicationUser { get; set; }
+        [Required]
+        public int OrderId { get; set; }
+
+        [ForeignKey("OrderId")]
+        public virtual OrderHeader OrderHeader { get; set; }
+
+        [Required]
         public int MenuItemId { get; set; }
 
-        [NotMapped]
         [ForeignKey("MenuItemId")]
         public virtual MenuItem MenuItem { get; set; }
 
-        [Range(1,int.MaxValue,ErrorMessage="Please enter a value greater than, or equal to {1}")]
         public int Count { get; set; }
+
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        [Required]
+        public double Price { get; set; }
     }
 }
