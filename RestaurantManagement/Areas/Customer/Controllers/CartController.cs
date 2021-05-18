@@ -113,7 +113,7 @@ namespace RestaurantManagement.Areas.Customer.Controllers
             return View(detailsCart);
         }
 
-        //Summary Post
+        //Summary Post Method
 
         [HttpPost]
         [ValidateAntiForgeryToken]
