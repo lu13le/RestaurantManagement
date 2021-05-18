@@ -25,7 +25,7 @@ namespace RestaurantManagement.Models
 
 
         [Required]
-        [DisplayFormat(DataFormatString ="{0:C}")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         [DisplayName("Order Total")]
         public double OrderTotal { get; set; }
 
