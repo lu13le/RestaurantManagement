@@ -19,8 +19,15 @@ namespace RestaurantManagement.Utility
         public const string ssCouponCode = "ssCouponCode";
 
 
+		public const string StatusSubmited = "Submited";
+		public const string StatusInProcess = "Being prepared";
+		public const string StatusReady = "Ready for pickup";
+		public const string StatusCompleted = "Completed";
+		public const string StatusCanceled = "Canceled";
 
-
+		public const string PaymentStatusPending = "Pending";
+		public const string PaymentStatusApproved = "Approved";
+		public const string PaymentStatusRejected = "Rejected";
 
 		//basic fuction converting html to rawHtml
 		public static string ConvertToRawHtml(string source)
