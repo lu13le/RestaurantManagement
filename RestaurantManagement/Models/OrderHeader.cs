@@ -26,12 +26,12 @@ namespace RestaurantManagement.Models
 
         [Required]
         [DisplayFormat(DataFormatString = "{0:C}")]
-        [DisplayName("Order Total")]
+        [DisplayName("Order total")]
         public double OrderTotal { get; set; }
 
 
         [Required]
-        [DisplayName("Pickup Time")]
+        [DisplayName("Pickup time")]
         public DateTime PickUpTime { get; set; }
 
 
@@ -40,7 +40,7 @@ namespace RestaurantManagement.Models
         public DateTime PickUpDate { get; set; }
 
 
-        [Display(Name ="Coupon Code")]
+        [Display(Name ="Coupon code")]
         public string CouponCode { get; set; }
         public double CouponCodeDiscount { get; set; }
         public string Status { get; set; }
@@ -48,11 +48,11 @@ namespace RestaurantManagement.Models
         public string Comments { get; set; }
 
 
-        [Display(Name ="Pickup Name")]
+        [Display(Name ="Pickup name")]
         public string PickupName { get; set; }
 
 
-        [Display(Name = "Phone Number")]
+        [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
 
         public string TranscationId { get; set; }
