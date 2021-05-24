@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using RestaurantManagement.Models;
+using RestaurantManagement.Utility;
 
 namespace RestaurantManagement.Areas.Identity.Pages.Account
 {
@@ -23,17 +26,20 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public ExternalLoginModel(
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -51,6 +57,15 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+            [Required]
+            public string Name { get; set; }
+            [DisplayName("Street Address")]
+            public string StreetAdress { get; set; }
+            [DisplayName("Phone Number")]
+            public string PhoneNumber { get; set; }
+            public string City { get; set; }
+            [DisplayName("Postal Code")]
+            public string PostalCode { get; set; }
         }
 
         public IActionResult OnGetAsync()
@@ -101,7 +116,9 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
                 {
                     Input = new InputModel
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        Name = info.Principal.FindFirstValue(ClaimTypes.Name),
+                        
                     };
                 }
                 return Page();
@@ -121,7 +138,17 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    Name = Input.Name,
+                    City = Input.City,
+                    StreetAdress = Input.StreetAdress,
+                    PostalCode = Input.PostalCode,
+                    PhoneNumber = Input.PhoneNumber
+
+                };
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -129,6 +156,7 @@ namespace RestaurantManagement.Areas.Identity.Pages.Account
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
+                        await _userManager.AddToRoleAsync(user, SD.CustomerEndUser);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                         var userId = await _userManager.GetUserIdAsync(user);

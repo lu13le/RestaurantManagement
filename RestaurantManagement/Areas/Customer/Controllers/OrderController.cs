@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagement.Data;
@@ -20,9 +21,11 @@ namespace RestaurantManagement.Areas.Customer.Controllers
     {
         private int PageSize = 2;
         private readonly ApplicationDbContext _db;
-        public OrderController(ApplicationDbContext db)
+        private readonly IEmailSender _emailSender;
+        public OrderController(ApplicationDbContext db, IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
 
         [Authorize]
@@ -145,7 +148,7 @@ namespace RestaurantManagement.Areas.Customer.Controllers
             await _db.SaveChangesAsync();
 
             //Email logic to notify user that order is ready for pickup
-           // await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Ready for Pickup " + orderHeader.Id.ToString(), "Order is ready for pickup.");
+            await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Ready for Pickup " + orderHeader.Id.ToString(), "Order is ready for pickup.");
 
 
             return RedirectToAction("ManageOrder", "Order");
@@ -156,10 +159,11 @@ namespace RestaurantManagement.Areas.Customer.Controllers
         [Authorize(Roles = SD.KitchenUser + "," + SD.ManagerUser)]
         public async Task<IActionResult> OrderCancel(int OrderId)
         {
+
             OrderHeader orderHeader = await _db.OrderHeaders.FindAsync(OrderId);
             orderHeader.Status = SD.StatusCanceled;
             await _db.SaveChangesAsync();
-            //await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Cancelled " + orderHeader.Id.ToString(), "Order has been cancelled successfully.");
+            await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Cancelled " + orderHeader.Id.ToString(), "Order has been cancelled successfully.");
 
             return RedirectToAction("ManageOrder", "Order");
         }
@@ -270,7 +274,7 @@ namespace RestaurantManagement.Areas.Customer.Controllers
             OrderHeader orderHeader = await _db.OrderHeaders.FindAsync(orderId);
             orderHeader.Status = SD.StatusCompleted;
             await _db.SaveChangesAsync();
-           // await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Completed " + orderHeader.Id.ToString(), "Order has been completed successfully.");
+            await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == orderHeader.UserId).FirstOrDefault().Email, "Spice - Order Completed " + orderHeader.Id.ToString(), "Order has been completed successfully.");
 
             return RedirectToAction("OrderPickup", "Order");
         }

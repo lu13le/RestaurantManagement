@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManagement.Data;
@@ -18,13 +19,15 @@ namespace RestaurantManagement.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IEmailSender _emailSender;
 
         [BindProperty]
         public OrderDetailsCart detailsCart { get; set; }
 
-        public CartController(ApplicationDbContext db)
+        public CartController(ApplicationDbContext db, IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
 
         //Display of items in cart
@@ -194,6 +197,9 @@ namespace RestaurantManagement.Areas.Customer.Controllers
 
             if (charge.Status.ToLower() == "succeeded")
             {
+                await _emailSender.SendEmailAsync(_db.Users.Where(u => u.Id == claim.Value).FirstOrDefault().Email, "Spice - Order Created " + detailsCart.OrderHeader.Id.ToString(), "Order has been submitted successfully.");
+
+
                 detailsCart.OrderHeader.PaymentStatus = SD.PaymentStatusApproved;
                 detailsCart.OrderHeader.Status = SD.StatusSubmited;
             }

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RestaurantManagement.Data;
+using RestaurantManagement.Service;
 using RestaurantManagement.Utility;
 using Stripe;
 using System;
@@ -55,7 +57,10 @@ namespace RestaurantManagement
 
             });
 
+            services.AddScoped<IDbInitializer, DbInitializer>();
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+            services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<EmailOptions>(Configuration);
 
             services.AddSession(options =>
             {
@@ -63,13 +68,17 @@ namespace RestaurantManagement
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.HttpOnly = true;
             });
-          
 
+            services.AddAuthentication().AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = "813959895879986";
+                facebookOptions.AppSecret = "d4060e46ffa1b6f7f2488ed274aaf5a5";
+            });
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,IDbInitializer dbInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -83,6 +92,7 @@ namespace RestaurantManagement
                 app.UseHsts();
             }
 
+            dbInitializer.Initialize();
             StripeConfiguration.ApiKey = Configuration.GetSection("Stripe")["SecretKey"];
             app.UseHttpsRedirection();
             app.UseStaticFiles();
