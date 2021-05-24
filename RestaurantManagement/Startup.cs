@@ -57,7 +57,7 @@ namespace RestaurantManagement
 
             });
 
-            services.AddScoped<IDbInitializer, DbInitializer>();
+            
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
             services.AddSingleton<IEmailSender, EmailSender>();
             services.Configure<EmailOptions>(Configuration);
@@ -78,7 +78,7 @@ namespace RestaurantManagement
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,IDbInitializer dbInitializer)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -92,7 +92,7 @@ namespace RestaurantManagement
                 app.UseHsts();
             }
 
-            dbInitializer.Initialize();
+            
             StripeConfiguration.ApiKey = Configuration.GetSection("Stripe")["SecretKey"];
             app.UseHttpsRedirection();
             app.UseStaticFiles();
